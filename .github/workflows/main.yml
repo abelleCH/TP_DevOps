@@ -32,7 +32,7 @@ jobs:
           context: TP1_devops/API/simple-api-student-main
           # Note: tags has to be all lower-case
           tags:  ${{secrets.Docker_username}}/tp-devops-image_api:latest
-          # push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
 
 
 
@@ -44,7 +44,7 @@ jobs:
           context: TP1_devops/database
           # Note: tags has to be all lower-case
           tags:  ${{secrets.Docker_username}}/tp-devops-image_database:latest
-          # push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
      # DO the same for httpd
@@ -54,6 +54,6 @@ jobs:
           context: TP1_devops/server
           # Note: tags has to be all lower-case
           tags:  ${{secrets.Docker_username}}/tp-devops-image_httpd:latest
-          # push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
   
 
