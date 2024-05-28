@@ -1,6 +1,7 @@
 # TP Part 02 Github Actions - Abelle Charlemagne
 ## Target Application
 Complete pipeline workflow for testing and delivering your software application.
+## Build and test your Application
 ### 2-1 What are testcontainers?
 
 Testcontainers is a popular testing library in the Java ecosystem that allows developers to create and manage lightweight, throwaway instances of databases, message brokers, web servers, and other services running in Docker containers
@@ -45,8 +46,16 @@ jobs:
         run: mvn clean verify --file TP1_devops/API/simple-api-student-main/pom.xml
         # Run Maven to clean and verify the project using the specified pom.xml file
 ```
+## First steps into the CD World
 ### Working CI & Docker images pushed to your repository.
+I'm now able to find my docker images on my dockerhub repository.
 
 ![alt text](image.png)
 
+
+## Register to SonarCloud
+After connecting to sonar, creating an organization and a project, we used SonarCloud analysis in our pipeline.
+
 ![alt text](image-1.png)
+
+## Bonus: split pipelines (Optional)
