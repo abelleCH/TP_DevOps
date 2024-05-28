@@ -16,5 +16,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t your-dockerhub-username/your-image-name:latest .
-          docker push your-dockerhub-username/your-image-name:latest
+          docker build -t abellech/my-postgres-image:latest
+          docker push abellech/my-postgres-image:latest
