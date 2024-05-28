@@ -1,6 +1,0 @@
-# TP Part 02 Github Actions - Abelle Charlemagne
-## Target application
-Complete pipeline workflow for testing and delivering your software application.
-### First steps into the CI World
- We create a yaml file to describe the expected steps to be done over the pipeline execution.
-### Build and test your Application
