@@ -9,29 +9,39 @@ Testcontainers is a popular testing library in the Java ecosystem that allows de
 
 ```yaml
 name: CI devops 2024
+# The name of the GitHub Actions workflow
+
 on:
-  #to begin you want to launch this job in main and develop
+  # Define the events that will trigger the workflow
   push:
     branches: 
       - main
       - develop
+      # Trigger the workflow on pushes to the main and develop branches
   pull_request:
+  # Trigger the workflow on pull requests
 
 jobs:
   test-backend: 
+    # Define a job named "test-backend"
     runs-on: ubuntu-22.04
+    # Specify that the job should run on an Ubuntu 22.04 runner
     steps:
-     #checkout your github code using actions/checkout@v2.5.0
+    # Define the steps to be executed in the job
+
+     # Checkout your GitHub code using the actions/checkout@v2.5.0 action
       - uses: actions/checkout@v2.5.0
 
-     #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
+     # Use another action (actions/setup-java@v3) to set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
+          # Specify the distribution and version of Java to be set up
 
-     #finally build your app with the latest command
+     # Finally, build your app with the latest Maven command
       - name: Build and test with Maven
         run: mvn clean verify --file TP1_devops/API/simple-api-student-main/pom.xml
+        # Run Maven to clean and verify the project using the specified pom.xml file
 ```
