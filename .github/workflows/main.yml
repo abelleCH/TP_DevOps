@@ -25,3 +25,35 @@ jobs:
       - name: Build and test with Maven
         run: mvn clean verify --file TP1_devops/API/simple-api-student-main/pom.xml
 
+      - name: Build image and push backend
+        uses: docker/build-push-action@v3
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./simple-api-student-main
+          # Note: tags has to be all lower-case
+          tags:  ${{secrets.Docker_username}}/tp-devops-image_api:latest
+          # push: ${{ github.ref == 'refs/heads/main' }}
+
+
+
+     - name: Build image and push database
+       # DO the same for database
+       uses: docker/build-push-action@v3
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./database
+          # Note: tags has to be all lower-case
+          tags:  ${{secrets.Docker_username}}/tp-devops-image_database:latest
+          # push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push httpd
+     # DO the same for httpd
+     uses: docker/build-push-action@v3
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./server
+          # Note: tags has to be all lower-case
+          tags:  ${{secrets.Docker_username}}/tp-devops-image_httpd:latest
+          # push: ${{ github.ref == 'refs/heads/main' }}
+  
+
