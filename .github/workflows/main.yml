@@ -1,4 +1,4 @@
-name: CI/CD
+name: Test Backend
 
 on:
   push:
@@ -22,39 +22,3 @@ jobs:
 
       - name: Build and test with Maven
         run: mvn -B verify sonar:sonar -Dsonar.projectKey=tpdev-main-yml_analyse-main -Dsonar.organization=tpdev-main-yml -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file TP1_devops/API/simple-api-student-main/pom.xml
-
-      - name: Login to DockerHub
-        run: docker login -u ${{ secrets.Docker_username}} -p ${{ secrets.Docker_token }}
-
-      - name: Build image and push backend
-        uses: docker/build-push-action@v3
-        with:
-          # relative path to the place where source code with Dockerfile is located
-          context: TP1_devops/API/simple-api-student-main
-          # Note: tags has to be all lower-case
-          tags:  ${{secrets.Docker_username}}/tp-devops-image_api:latest
-          push: ${{ github.ref == 'refs/heads/main' }}
-
-      - name: Build image and push database
-       # DO the same for database
-        uses: docker/build-push-action@v3
-        with:
-          # relative path to the place where source code with Dockerfile is located
-          context: TP1_devops/database
-          # Note: tags has to be all lower-case
-          tags:  ${{secrets.Docker_username}}/tp-devops-image_database:latest
-          push: ${{ github.ref == 'refs/heads/main' }}
-
-      - name: Build image and push httpd
-     # DO the same for httpd
-        uses: docker/build-push-action@v3
-        with:
-          # relative path to the place where source code with Dockerfile is located
-          context: TP1_devops/server
-          # Note: tags has to be all lower-case
-          tags:  ${{secrets.Docker_username}}/tp-devops-image_httpd:latest
-          push: ${{ github.ref == 'refs/heads/main' }}
-
-
-  
-
