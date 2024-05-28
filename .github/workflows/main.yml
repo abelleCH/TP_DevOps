@@ -23,7 +23,7 @@ jobs:
 
      #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=tpdev-main-yml_analyse-main -Dsonar.organization=tpdev_main_yml -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file TP1_devops/API/simple-api-student-main/pom.xml
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=tpdev-main-yml_analyse-main -Dsonar.organization=tpdev-main-yml -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file TP1_devops/API/simple-api-student-main/pom.xml
 
       - name: Login to DockerHub
         run: docker login -u ${{ secrets.Docker_username}} -p ${{ secrets.Docker_token }}
