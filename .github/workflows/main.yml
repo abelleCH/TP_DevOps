@@ -36,9 +36,9 @@ jobs:
 
 
 
-     - name: Build image and push database
+      - name: Build image and push database
        # DO the same for database
-       uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v3
         with:
           # relative path to the place where source code with Dockerfile is located
           context: ./database
@@ -48,7 +48,7 @@ jobs:
 
       - name: Build image and push httpd
      # DO the same for httpd
-     uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v3
         with:
           # relative path to the place where source code with Dockerfile is located
           context: ./server
