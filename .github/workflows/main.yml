@@ -29,7 +29,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           # relative path to the place where source code with Dockerfile is located
-          context: ./API/simple_api_student-main
+          context: TP1_devops/API/simple-api-student-main
           # Note: tags has to be all lower-case
           tags:  ${{secrets.Docker_username}}/tp-devops-image_api:latest
           # push: ${{ github.ref == 'refs/heads/main' }}
