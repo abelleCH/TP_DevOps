@@ -45,3 +45,6 @@ jobs:
         run: mvn clean verify --file TP1_devops/API/simple-api-student-main/pom.xml
         # Run Maven to clean and verify the project using the specified pom.xml file
 ```
+### Working CI & Docker images pushed to your repository.
+
+![alt text](image.png)
