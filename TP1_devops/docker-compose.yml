@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+    API:
+        container_name: API
+        image: abellech/image_api:2.0
+        environment:
+            DB_host: my-postgres-container1
+            DB_port: 5432
+            DB_name: db
+            DB_user: usr
+            DB_mdp: pwd
+        networks:
+            - app-network
+        depends_on:
+            - database
+
+    database:
+        container_name: my-postgres-container1
+        image: abellech/my-postgres-image:1.0
+        environment:
+            POSTGRES_DB: db
+            POSTGRES_USER: usr
+            POSTGRES_PASSWORD: pwd
+        volumes:
+            - db-data:/var/lib/postgresql/data
+        networks:
+            - app-network
+
+    server:
+        container_name: server
+        image: abellech/my-httpd-server:2.0
+        environment:
+            BACKEND_host: API
+        ports:
+            - "80:80"
+        networks:
+            - app-network
+        depends_on:
+            - API
+
+
+networks:
+    app-network:
+
+volumes:
+    db-data: 

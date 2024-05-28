@@ -1,0 +1,12 @@
+# Use a lightweight Java runtime environment
+FROM openjdk:11-jre-slim
+
+# Copy the compiled Java class to the container
+COPY Main.class /usr/src/myapp/Main.class
+
+# Set the working directory
+WORKDIR /usr/src/myapp
+
+# Command to run the Java program
+CMD ["java", "Main"]
+

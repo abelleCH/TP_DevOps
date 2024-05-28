@@ -1,0 +1,9 @@
+# Use the official Apache HTTP Server image
+FROM httpd:2.4-alpine
+
+# Copy the index.html file to the default Apache HTML directory
+COPY index.html /usr/local/apache2/htdocs/
+COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+
+
+# evite dexposer les conteneur api et les ports

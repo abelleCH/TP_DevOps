@@ -1,0 +1,158 @@
+# TP Part 01 Docker - Abelle Charlemagne
+
+## Target application
+#### 3-tiers application:
+
+- HTTP server
+- Backend API
+- Database
+
+For each of those applications, we will follow the same process: choose the appropriate docker base image, create and configure this image, put our application specifics inside and at some point have it running. Our final goal is to have a 3-tier web API running.
+
+## Database
+
+### 1-1 Document your database container essentials: commands and Dockerfile.
+
+I made the following commands:
+
+1) Build the postgres image :
+```docker build -t my-postgres-image ```
+
+2) Create postgres container :
+```docker run --name my-postgres-container --network app-network -p 5432:5432 -d my-postgres-image```
+
+3) Create adminer container : 
+```docker run --name my-adminer-container --network app-network -p 8080:8080 -d adminer```
+
+4) Create network :
+```docker network create app-network```
+
+5) Create postgres container with persistence, use of volume :
+```docker run --name my-postgres-container --network app-network -p 5432:5432 -v C:\Users\Admin\OneDrive\Documents\Bureau\TP1_devops\data:/var/lib/postgresql/data -d my-postgres-image```
+
+
+In the Dockerfile we have : 
+
+```Dockerfile
+FROM postgres:14.1-alpine
+
+ENV POSTGRES_DB=db
+POSTGRES_USER=usr
+POSTGRES_PASSWORD=pwd
+
+COPY 01-CreateScheme.sql docker-entrypoint-initdb.d/01-CreateScheme.sql
+COPY 02-InsertData.sql docker-entrypoint-initdb.d/02-InsertData.sql
+```
+We define the Postgres image to be used, then define the environment variables for the PostgreSQL database and finally copy the 2 files containing the tables from the local directory into the ```docker-entrypoint-initdb.d/``` directory of the Docker image. This directory is specific to the PostgreSQL image and any SQL file placed here will be automatically executed when the container is started to initialize the database.
+
+## Backend API
+### 1-2 Why do we need a multistage build? And explain each step of this dockerfile.
+
+Multistage build is used to build a Java application without requiring Maven or Java to be installed on our local machine. Instead, we use Docker images that contain the tools needed for each stage of the build. In our case, it is mandatory to use it if java is not installed.
+
+In the Dockerfile we have : 
+
+```Dockerfile
+# Build
+FROM maven:3.8.6-amazoncorretto-17 AS myapp-build
+ENV MYAPP_HOME /opt/myapp
+WORKDIR $MYAPP_HOME
+COPY pom.xml .
+COPY src ./src
+RUN mvn package -DskipTests
+
+# Run
+FROM amazoncorretto:17
+ENV MYAPP_HOME /opt/myapp
+WORKDIR $MYAPP_HOME
+COPY --from=myapp-build $MYAPP_HOME/target/*.jar $MYAPP_HOME/myapp.jar
+
+ENTRYPOINT java -jar myapp.jar
+```
+
+This Dockerfile is used to create a Docker image that builds and runs a Java application using Maven as the build tool and Amazon Corretto as the JDK. Here's a step-by-step explanation of each command :
+
+Part Build : 
+
+1) ``FROM maven:3.8.6-amazoncorretto-17 AS myapp-build`` : defines the base image to be used for this build step.
+2) ```ENV MYAPP_HOME /opt/myapp``` : defines a MYAPP_HOME environment variable containing the path to the application's main directory.
+3) ```WORKDIR $MYAPP_HOME``: sets the working directory to $MYAPP_HOME, i.e. ``/opt/myapp```.
+4) ``COPY pom.xml .``: copies the pom.xml file (Maven configuration file) from the local directory into the Docker image working directory.
+5) ``COPY src ./src``: copies the src directory (containing the application source code) from the local directory into the Docker image working directory.
+6) ``RUN mvn package -DskipTests``: executes Maven's packaging phase, building the Java application. The -DskipTests option is used to skip test execution during build.
+
+Part Run :
+
+7) ``FROM amazoncorretto:17``: defines a new base image for the runtime step. In this case, the image is ``amazoncorretto:17``, which contains Amazon Corretto JDK version 17.
+8) ``ENV MYAPP_HOME /opt/myapp``: redefines the ``MYAPP_HOME`` environment variable for this step.
+9) ``WORKDIR $MYAPP_HOME``: Sets the working directory to ``$MYAPP_HOME``.
+10) ``COPY --from=myapp-build $MYAPP_HOME/target/*.jar $MYAPP_HOME/myapp.jar`` : Copies the JAR file generated during the build step (myapp-build step) into the working directory of this step.
+11) ``ENTRYPOINT java -jar myapp.jar``: defines the command to be executed when the container is started. It executes the Java application JAR file using Java Runtime (java -jar myapp.jar).
+
+## Link application
+### 1-3 Document docker-compose most important commands. 
+
+1) ``docker-compose up ``: to start the containers defined in the docker-compose.yml file.
+2) ``docker-compose down`` : stops and removes all the containers defined in the docker-compose.yml file.
+3) ``docker-compose build`` : builds the Docker images defined in the docker-compose.yml file
+4) ``docker-compose ps`` : lists all the containers associated with the project defined in the docker-compose.yml file.
+5) ``docker-compose exec <service-name> <command>`` :  allows you to execute a command inside a running container.
+
+### 1-4 Document your docker-compose file.
+```yaml
+version: '3.7'  # Version of Docker Compose specification used
+
+services:  # Definition of services
+
+    API:  # API service
+        container_name: API  # Container name
+        image: abellech/image_api:2.0  # Docker image used for this service
+        environment:  # Container environment variables
+            DB_host: my-postgres-container1  # Database host
+            DB_port: 5432  # Database port
+            DB_name: db  # Database name
+            DB_user: usr  # Database user
+            DB_mdp: pwd  # Database password
+        networks:  # Networks the container is connected to
+            - app-network  # 'app-network' network
+        depends_on:  # Services this service depends on
+            - database  # Depends on 'database' service
+
+    database:  # Database service
+        container_name: my-postgres-container1  # Container name
+        image: abellech/my-postgres-image:1.0  # Docker image used for this service
+        environment:  # Container environment variables
+            POSTGRES_DB: db  # PostgreSQL database name
+            POSTGRES_USER: usr  # PostgreSQL database user
+            POSTGRES_PASSWORD: pwd  # PostgreSQL database password
+        volumes:  # Volumes mounted into the container
+            - db-data:/var/lib/postgresql/data  # Volume for storing database data
+        networks:  # Networks the container is connected to
+            - app-network  # 'app-network' network
+
+    server:  # Server service
+        container_name: server  # Container name
+        image: abellech/my-httpd-server:2.0  # Docker image used for this service
+        environment:  # Container environment variables
+            BACKEND_host: API  # Backend host used by this server
+        ports:  # Ports exposed by the container
+            - "80:80"  # Redirecting port 80 of the container to port 80 of the host
+        networks:  # Networks the container is connected to
+            - app-network  # 'app-network' network
+        depends_on:  # Services this service depends on
+            - API  # Depends on 'API' service
+
+networks:  # Definition of networks
+    app-network:  # app-network network
+
+volumes:  # Definition of volumes
+    db-data:  # db-data volume
+```
+
+
+### 1-5 Document your publication commands and published images in dockerhub.
+
+1) Tag an image : ``docker tag image_api abellech/image_api:2.0``
+2) Push image to dockerhub : ``docker push abellech/image_api:2.0``
+
+And this for my 4 images : ``image_api:2.0``, ``my-postgres-image:1.0``, ``adminer:1.0`` (not mandatory) and ``my-httpd-server:2.0``.
