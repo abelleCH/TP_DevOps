@@ -1,0 +1,18 @@
+---
+# tasks file for roles/proxy
+- name: Run server
+  docker_container:
+    state: started
+    pull: true
+    networks: 
+      - name: app-network
+    name: server
+    image: abellech/tp-devops-image_httpd
+    env:
+      BACKEND_host: api
+    ports:
+            - "80:80"
+  vars:
+      ansible_python_interpreter: /usr/bin/python3  
+
+

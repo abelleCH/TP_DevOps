@@ -1,0 +1,19 @@
+---
+# tasks file for roles/app
+
+- name: Run API
+  docker_container:
+    state: started
+    pull: true
+    networks: 
+      - name: app-network
+    name: api
+    image: abellech/tp-devops-image_api
+    env:
+      DB_host: database
+      DB_port: "5432"
+      DB_name: db
+      DB_user: usr
+      DB_mdp: pwd
+  vars:
+      ansible_python_interpreter: /usr/bin/python3  
