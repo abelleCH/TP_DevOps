@@ -69,8 +69,10 @@ We have separated our jobs into different workflows so that they respect 2 thing
 
 Here is the code associated : 
 
+- test-backend :
+
 ```yaml
-name: CI devops 2024
+name: test-backend 
 
 on:
   push:
@@ -97,16 +99,38 @@ jobs:
       - name: Build and test with Maven
         run: mvn -B verify sonar:sonar -Dsonar.projectKey=tpdev-main-yml_analyse-main -Dsonar.organization=tpdev-main-yml -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file TP1_devops/API/simple-api-student-main/pom.xml
 
+```
+- build-and-push-docker-image :
+
+```yaml
+name: build-and-push-docker-image
+
+on:
+  workflow_run:
+    workflows: ["test-backend"]
+    types:
+      - completed
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
   build-and-push-docker-image:
-    needs: test-backend
-    if: github.ref == 'refs/heads/main' && needs.test-backend.result == 'success'
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.5.0
 
+      - name: Verify Dockerfile paths
+        run: |
+          ls -la TP1_devops/API/simple-api-student-main
+          ls -la TP1_devops/database
+          ls -la TP1_devops/server
+
       - name: Login to DockerHub
-        run: docker login -u ${{ secrets.Docker_username}} -p ${{ secrets.Docker_token }}
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build image and push backend
         uses: docker/build-push-action@v3
