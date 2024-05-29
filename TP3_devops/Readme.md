@@ -222,3 +222,51 @@ We have 5 roles, and in each of these we have tasks that contain the main list o
   vars:
       ansible_python_interpreter: /usr/bin/python3  
 ```
+
+## Continuous Deployment
+
+I created an other workflow :
+
+```yaml
+name: deploy ansible
+
+on:
+  workflow_run:
+    workflows: ["build-and-push-docker-image"]
+    types:
+      - completed
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-push-docker-image:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+
+      - name: Add SSH private key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'false'
+        run: ansible-playbook -i TP1_devops/ansible/inventories/setup.yml TP1_devops/ansible/playbook.yml
+```
+
