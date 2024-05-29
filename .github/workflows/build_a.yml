@@ -2,8 +2,8 @@ name: build-and-push-docker-image
 
 on:
   workflow_run:
-    workflows: ["test-backend  -  test-backend "]
-  types:
+    workflows: ["test-backend"]
+    types:
       - completed
   push:
     branches:
