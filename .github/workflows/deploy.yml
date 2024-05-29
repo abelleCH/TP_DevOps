@@ -5,13 +5,7 @@ on:
     workflows: ["build-and-push-docker-image"]
     types:
       - completed
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+      
 jobs:
   build-and-push-docker-image:
     if: github.event.workflow_run.conclusion == 'success'
