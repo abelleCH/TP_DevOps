@@ -1,0 +1,46 @@
+name: build-and-push-docker-image
+
+on:
+  workflow_run:
+    workflows: ["test-backend  -  test-backend "]
+  types:
+      - completed
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-and-push-docker-image:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Verify Dockerfile paths
+        run: |
+          ls -la TP1_devops/API/simple-api-student-main
+          ls -la TP1_devops/database
+          ls -la TP1_devops/server
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build image and push backend
+        uses: docker/build-push-action@v3
+        with:
+          context: TP1_devops/API/simple-api-student-main
+          tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_api:latest
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v3
+        with:
+          context: TP1_devops/database
+          tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_database:latest
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v3
+        with:
+          context: TP1_devops/server
+          tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_httpd:latest

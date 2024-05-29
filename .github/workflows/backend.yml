@@ -1,4 +1,4 @@
-name: CI devops 2024
+name: test-backend 
 
 on:
   push:
