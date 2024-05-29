@@ -10,7 +10,7 @@ For the connection :
 3) Set up access with ``chmod 400 .ssh/id_rsa``
 4) ``ssh -i .ssh/id_rsa centos@abelle.charlemagne.takima.cloud``
 
-For the ping
+For the ping :
 1) Change the folder stup.yml with the hostname and path to key (See code below)
 3) Access to ``/mnt/c/Users/Admin/OneDrive/Documents/Bureau/TP_devops/TP1_devops/ansible``
 4) ``ansible all -i inventories/setup.yml -m setup -a "filter=ansible_distribution*"``
@@ -144,8 +144,10 @@ We have 5 roles, and in each of these we have tasks that contain the main list o
     vars:
       ansible_python_interpreter: /usr/bin/python3
 ```
+We install and configure Docker, as well as Python3 and the Docker module for Python. We check that Docker is running and log in to retrieve our images later.
 
-- create network
+
+- Create network
 
 ```yaml
 ---
@@ -155,6 +157,10 @@ We have 5 roles, and in each of these we have tasks that contain the main list o
     vars:
       ansible_python_interpreter: /usr/bin/python3
 ```
+
+We create the network called app-network and using python 3 is specified.
+
+For the next 3 roles, we'll set the state to started to ensure that the container is started, notify the network we're using, give the container a name, provide the image we want to use and the necessary environment variables.
 
 - Launch database
 
@@ -178,13 +184,14 @@ We have 5 roles, and in each of these we have tasks that contain the main list o
       ansible_python_interpreter: /usr/bin/python3  
 ```
 
+
 - Launch api
 
 ```yaml
 ---
 # tasks file for roles/api
 
-- name: Run API
+- name: Launch API
   docker_container:
     state: started
     pull: true
@@ -207,7 +214,7 @@ We have 5 roles, and in each of these we have tasks that contain the main list o
 ```yaml
 ---
 # tasks file for roles/proxy
-- name: Run server
+- name: Launch server
   docker_container:
     state: started
     pull: true
@@ -225,7 +232,7 @@ We have 5 roles, and in each of these we have tasks that contain the main list o
 
 ## Continuous Deployment
 
-I created an other workflow :
+I created an other workflow running after the 2 previous :
 
 ```yaml
 name: deploy ansible
@@ -270,3 +277,4 @@ jobs:
         run: ansible-playbook -i TP1_devops/ansible/inventories/setup.yml TP1_devops/ansible/playbook.yml
 ```
 
+![alt text](image.png)
