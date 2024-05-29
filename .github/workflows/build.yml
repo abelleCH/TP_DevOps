@@ -5,6 +5,9 @@ on:
     workflows: ["test-backend"]
     types:
       - completed
+    push:
+    branches:
+      - main
 
 jobs:
   build-and-push-docker-image:
