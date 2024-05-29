@@ -36,7 +36,7 @@
   - name: Login to Docker
     docker_login:
       username: abellech
-      password: dckr_pat_TildHT5koHWV-bKkNwnlRTgWu2w
+      password: "{{ lookup('env', 'DOCKER_TOK') }}"
       reauthorize: yes 
     vars:
       ansible_python_interpreter: /usr/bin/python3
