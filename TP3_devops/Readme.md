@@ -81,9 +81,144 @@ That calls the docker roles and in this directory we have
 
 ## Deploy your App
 
-We have 5 roles : 
-- docker
-- network
-- database
-- app
-- proxy
+Here is the playbook that specifies a list of Ansible roles to be applied :
+
+```yaml
+- hosts: all
+  gather_facts: false
+  become: true
+
+  roles:
+    - docker
+    - network
+    - database
+    - api
+    - proxy
+```
+
+We have 5 roles, and in each of these we have tasks that contain the main list of tasks to be carried out by the role.
+
+- Install docker
+
+```yaml
+---
+# tasks file for roles/docker
+  - name: Install device-mapper-persistent-data
+    yum:
+      name: device-mapper-persistent-data
+      state: latest
+
+  - name: Install lvm2
+    yum:
+      name: lvm2
+      state: latest
+
+  - name: add repo docker
+    command:
+      cmd: sudo yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+
+  - name: Install Docker
+    yum:
+      name: docker-ce
+      state: present
+
+  - name: Install python3
+    yum:
+      name: python3
+      state: present
+
+  - name: Install docker with Python 3
+    pip:
+      name: docker
+      executable: pip3
+
+  - name: Make sure Docker is running
+    service: name=docker state=started
+    tags: docker
+
+  - name: Login to Docker
+    docker_login:
+      username: abellech
+      password: dckr_pat_TildHT5koHWV-bKkNwnlRTgWu2w
+      reauthorize: yes 
+    vars:
+      ansible_python_interpreter: /usr/bin/python3
+```
+
+- create network
+
+```yaml
+---
+  - name: Create a network
+    docker_network:
+      name: app-network
+    vars:
+      ansible_python_interpreter: /usr/bin/python3
+```
+
+- Launch database
+
+```yaml
+---
+# tasks file for roles/database
+
+- name: Launch database
+  docker_container:
+    state: started
+    pull: true
+    networks: 
+      - name: app-network
+    name: database
+    image: abellech/tp-devops-image_database
+    env:
+      POSTGRES_DB: db
+      POSTGRES_USER: usr
+      POSTGRES_PASSWORD: pwd
+  vars:
+      ansible_python_interpreter: /usr/bin/python3  
+```
+
+- Launch api
+
+```yaml
+---
+# tasks file for roles/api
+
+- name: Run API
+  docker_container:
+    state: started
+    pull: true
+    networks: 
+      - name: app-network
+    name: api
+    image: abellech/tp-devops-image_api
+    env:
+      DB_host: database
+      DB_port: "5432"
+      DB_name: db
+      DB_user: usr
+      DB_mdp: pwd
+  vars:
+      ansible_python_interpreter: /usr/bin/python3  
+```
+
+- Launch proxy
+
+```yaml
+---
+# tasks file for roles/proxy
+- name: Run server
+  docker_container:
+    state: started
+    pull: true
+    networks: 
+      - name: app-network
+    name: server
+    image: abellech/tp-devops-image_httpd
+    env:
+      BACKEND_host: api
+    ports:
+            - "80:80"
+  vars:
+      ansible_python_interpreter: /usr/bin/python3  
+```
