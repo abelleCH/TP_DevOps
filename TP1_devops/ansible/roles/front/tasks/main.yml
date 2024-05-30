@@ -1,31 +1,19 @@
+
 ---
-# tasks file for roles/front
-
-- name: Ensure Docker SDK for Python is installed
-  pip:
-    name: docker
-    state: present
-    executable: /usr/bin/pip3
-
-- name: Build front image
-  docker_image:
-    name: devops-front-main
-    build: 
-      path: .
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
-
-- name: Set front container
+# tasks file for roles/proxy
+- name: Set front
   docker_container:
     state: started
     pull: true
     networks: 
       - name: app-network
-    name: front
-    image: devops-front-main
+    name: server
+    image: abellech/tp-devops-image_front
     env:
       FRONTEND_host: api
     ports:
-       - "80:80"
+            - "82:80"
   vars:
-    ansible_python_interpreter: /usr/bin/python3
+      ansible_python_interpreter: /usr/bin/python3  
+
+
