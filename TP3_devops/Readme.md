@@ -301,6 +301,17 @@ Here's my front role:
 
 ```
 
+To deploy, I added the in the workflow :
+
+```yaml
+- name: Build image and push front
+        uses: docker/build-push-action@v3
+        with:
+          context: TP1_devops/devops-front-main
+          tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_front:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+```
+
 And finally the playbook with the addition of the role front :
 
 ```yaml
@@ -315,15 +326,5 @@ And finally the playbook with the addition of the role front :
     - api
     - proxy
     - front
-```
-To deploy, I added the in the workflow :
-
-```yaml
-- name: Build image and push front
-        uses: docker/build-push-action@v3
-        with:
-          context: TP1_devops/devops-front-main
-          tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_front:latest
-          push: ${{ github.ref == 'refs/heads/main' }}
 ```
 
