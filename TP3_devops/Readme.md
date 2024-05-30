@@ -277,3 +277,42 @@ jobs:
 ```
 
 ![alt text](image.png)
+
+## Front
+I've made the necessary changes, but my image has a loading problem.
+
+Here's my front role:
+
+```yaml
+---
+# tasks file for roles/front
+- name: Set front
+  docker_container:
+    state: started
+    pull: true
+    networks: 
+      - name: app-network
+    name: front
+    image: abellech/tp-devops-image_front
+    ports:
+            - "82:80"
+  vars:
+      ansible_python_interpreter: /usr/bin/python3  
+
+```
+
+And finally the playbook with the addition of the role front :
+
+```yaml
+- hosts: all
+  gather_facts: false
+  become: true
+
+  roles:
+    - docker
+    - network
+    - database
+    - api
+    - proxy
+    - front
+```
