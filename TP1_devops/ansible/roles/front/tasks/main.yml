@@ -1,0 +1,31 @@
+---
+# tasks file for roles/front
+
+- name: Ensure Docker SDK for Python is installed
+  pip:
+    name: docker
+    state: present
+    executable: /usr/bin/pip3
+
+- name: Build front image
+  docker_image:
+    name: devops-front-main
+    build: 
+      path: .
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: Set front container
+  docker_container:
+    state: started
+    pull: true
+    networks: 
+      - name: app-network
+    name: front
+    image: devops-front-main
+    env:
+      FRONTEND_host: api
+    ports:
+       - "80:80"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3

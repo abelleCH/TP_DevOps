@@ -39,6 +39,15 @@ services:
         depends_on:
             - API
 
+    front:
+        container_name: front
+        build: devops-front-main
+        ports:
+            - "82:80"
+        networks:
+            - app-network   
+        depends_on:
+            - API         
 
 networks:
     app-network:
