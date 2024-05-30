@@ -242,13 +242,12 @@ on:
     workflows: ["build-and-push-docker-image"]
     types:
       - completed
-  push:
+    push:
     branches:
       - main
-  pull_request:
-
+      
 jobs:
-  build-and-push-docker-image:
+  deploy:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-22.04
     steps:

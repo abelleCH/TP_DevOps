@@ -110,10 +110,9 @@ on:
     workflows: ["test-backend"]
     types:
       - completed
-  push:
+    push:
     branches:
       - main
-  pull_request:
 
 jobs:
   build-and-push-docker-image:
@@ -128,6 +127,7 @@ jobs:
           ls -la TP1_devops/API/simple-api-student-main
           ls -la TP1_devops/database
           ls -la TP1_devops/server
+          ls -la TP1_devops/devops-front-main
 
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -137,18 +137,28 @@ jobs:
         with:
           context: TP1_devops/API/simple-api-student-main
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_api:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v3
         with:
           context: TP1_devops/database
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v3
         with:
           context: TP1_devops/server
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push front
+        uses: docker/build-push-action@v3
+        with:
+          context: TP1_devops/devops-front-main
+          tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_front:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
 ```
 ![alt text](image-2.png)
