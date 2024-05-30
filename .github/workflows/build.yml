@@ -22,7 +22,7 @@ jobs:
           ls -la TP1_devops/API/simple-api-student-main
           ls -la TP1_devops/database
           ls -la TP1_devops/server
-          ls -la TP1_devops/front
+          ls -la TP1_devops/devops-front-main
 
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -54,5 +54,5 @@ jobs:
       - name: Build image and push front
         uses: docker/build-push-action@v3
         with:
-          context: TP1_devops/front
+          context: TP1_devops/devops-front-main
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_front:latest
