@@ -1,5 +1,5 @@
 ---
-# tasks file for roles/proxy
+# tasks file for roles/front
 - name: Set front
   docker_container:
     state: started
