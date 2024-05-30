@@ -45,12 +45,6 @@ jobs:
           context: TP1_devops/server
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_httpd:latest
 
-      - name: Build image and push httpd
-        uses: docker/build-push-action@v3
-        with:
-          context: TP1_devops/server
-          tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_httpd:latest
-
       - name: Build image and push front
         uses: docker/build-push-action@v3
         with:
