@@ -1,4 +1,3 @@
-
 ---
 # tasks file for roles/proxy
 - name: Set front
@@ -7,7 +6,7 @@
     pull: true
     networks: 
       - name: app-network
-    name: server
+    name: front
     image: abellech/tp-devops-image_front
     env:
       FRONTEND_host: api
