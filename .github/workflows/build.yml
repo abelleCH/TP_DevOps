@@ -32,21 +32,25 @@ jobs:
         with:
           context: TP1_devops/API/simple-api-student-main
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_api:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v3
         with:
           context: TP1_devops/database
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v3
         with:
           context: TP1_devops/server
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push front
         uses: docker/build-push-action@v3
         with:
           context: TP1_devops/devops-front-main
           tags: ${{ secrets.DOCKER_USERNAME }}/tp-devops-image_front:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
