@@ -8,8 +8,6 @@
       - name: app-network
     name: front
     image: abellech/tp-devops-image_front
-    env:
-      FRONTEND_host: api
     ports:
             - "82:80"
   vars:
